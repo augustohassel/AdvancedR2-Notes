@@ -132,8 +132,12 @@ args(sample)
 
 args(library)
 
+# 6.8.1 Rewriting to prefix form -----
+`for`(i, 1:10, print(i))
 
+lapply(list(1:5,2:3,3:4), `+`, 3)
 
+# 6.8.3 Infix functions -----
 
-
-
+`%dir%` <- function(a, b) paste0("(", a, " %dir% ", b, ")")
+"a" %dir% "b" %dir% "c" %dir% "d"
