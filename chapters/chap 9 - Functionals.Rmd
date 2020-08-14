@@ -1,0 +1,215 @@
+---
+title: "Chap 9: Functionals"
+output: html_notebook
+---
+
+```{r, include=FALSE}
+library(purrr)
+```
+
+### 9.2 My first functional: `map()`
+
+```{r My first functional}
+triple <- function(x) x * 3
+map(1:3, triple)
+```
+#### 9.2.1 Producing atomic vectors
+
+```{r Producing atomic vectors}
+as.list(mtcars)
+map_chr(mtcars, typeof)
+map_lgl(mtcars, is.double)
+map_int(mtcars, function(x) length(unique(x)))
+map_dbl(mtcars, mean)
+
+```
+#### 9.2.2 Anonymous functions and shortcuts
+
+```{r Anonymous functions and shortcuts}
+?as_mapper()
+as_mapper(~ length(unique(.x)))
+map(1:3, ~ runif(2))
+```
+#### 9.2.3 Passing arguments with ...
+
+You can use `pluck()` with `map()` to use a charachter vector to select elements by name, an integer vector to select by position, or a list to select by both name and position.
+
+```{r Passing arguments with ...}
+x <- list(
+  list(-1, x = 1, y = c(2), z = "a"),
+  list(-2, x = 4, y = c(5, 6), z = "b"),
+  list(-4, x = 2, y = c(5, 6, 0))
+)
+map_dbl(x, "x")
+map_dbl(x, 1)
+map_dbl(x, list("y", 2), .default = NA) # passing arguments with ...
+```
+
+### 9.4 Map Variants
+
+#### 9.4.1 Same type of output as input: `modify()`
+```{r Same type of output as input}
+df <- data.frame(
+  x = 1:3,
+  y = 6:4
+)
+map(df, ~ .x * 2)
+modify(df, ~ .x * 2)
+```
+
+#### 9.4.2 Two input: `map2()` and friends
+
+```{r Two input}
+xs <- map(1:8, ~ runif(10))
+xs[[1]][[1]] <- NA
+ws <- map(1:8, ~ rpois(10, 5) + 1)
+
+map2_dbl(xs, ws, weighted.mean, na.rm  =T)
+```
+
+#### 9.4.3 No outputs: `walk()` and friends
+
+```{r No outputs, eval=FALSE}
+temp <- tempfile()
+dir.create(temp)
+
+cyls <- split(mtcars, mtcars$cyl)
+paths <- file.path(temp, paste0("cyl-", names(cyls), ".csv"))
+walk2(cyls, paths, write.csv)
+
+dir(temp)
+```
+
+#### 9.4.4 Iterating over values and indices: `imap()`
+
+```{r}
+imap(iris, ~ paste0("El primer valor de ", .y, " es ", .x[[1]])) # vector con nombre
+
+x <- map(1:6, ~ sample(1000, 10))
+imap_chr(x, ~ paste0("El mayor valor de la muestra ", .y, " es ", .x[[1]]))
+```
+
+### 9.5 Redue family
+
+#### 9.5.1 Basics: `reduce()`
+
+```{r}
+l <- map(1:4, ~ sample(x = 1:10, size = 15, replace = T))
+intersect(l[[1]], l[[2]])
+
+reduce(l, intersect)
+
+reduce(l, union)
+
+```
+
+#### 9.5.2 Accumulate: `acumulate()`
+
+```{r}
+accumulate(l, intersect)
+
+accumulate(l, union)
+```
+
+### 9.6 Predicate functionals
+
+#### 9.6.1 Basics
+
+- `some()` / `every()`
+- `detect()` / `detect_index()`
+- `keep()` / `discard()`
+
+```{r}
+df <- data.frame(x = 1:3, y = c("a", "b", "c"))
+
+some(df,  is.integer)
+every(df,  is.integer)
+
+detect(df, is.factor)
+detect_index(df, is.factor)
+
+str(keep(df, is.factor))
+str(discard(df, is.factor))
+
+```
+
+### 9.7 Base functionals
+
+#### 9.7.2 Mathematical concerns
+
+```{r}
+integrate(f = sin, lower = 0, 10)
+
+str(uniroot(f = function(x) x^3, interval = c(-5, 5)))
+
+str(optimise(f = function(x) - x^2, interval = c(-5, 5)))
+plot(seq(-5, 5, length.out = 50), seq(-5, 5, length.out = 50) ^ 2, type = "l")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
